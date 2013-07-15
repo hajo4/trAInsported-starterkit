@@ -29,7 +29,7 @@ end
 -- train [table]
 -- possibleDirections [table]
 function ai.chooseDirection(train, possibleDirections)
-  return chooseBrainless(train, possibleDirections)
+  return chooseAlmostBrainless(train, possibleDirections)
 end
 
 -- Wird aufgerufen, wenn der Zug blockiert wird
@@ -63,26 +63,26 @@ end
 -- ------------
 
 -- Wenn ein Passagier an Board ist wird versucht diesen ans Ziel zu bringen
-function chooseBrainless(train, possibleDirections)
+function chooseAlmostBrainless(train, possibleDirections)
   if train.passenger then 
     print("train.passenger destination:", train.passenger.destX, train.passenger.destY)
     print("train.pos:", train.x, train.y)
+    tbl = {}
+    if possibleDirections["N"] and train.passenger.destY+1 < train.y then
+      tbl[#tbl+1] = "N"
+    end
+    if possibleDirections["S"] and train.passenger.destY-1 > train.y then
+      tbl[#tbl+1] = "S"
+    end
+    if possibleDirections["E"] and train.passenger.destX+1 > train.x then
+      tbl[#tbl+1] = "E"
+    end
+    if possibleDirections["W"] and train.passenger.destX-1 < train.x then
+      tbl[#tbl+1] = "W"
+    end
     
-    if possibleDirections["N"] and train.passenger.destY+1 < train.y and random() < .7 then
-      print("Auf nach Norden!")
-      return "N"
-    end
-    if possibleDirections["S"] and train.passenger.destY-1 > train.y and random() < .7 then
-      print("Auf nach Süden")
-      return "S"
-    end
-    if possibleDirections["E"] and train.passenger.destX+1 > train.x and random() < .7 then
-      print("Auf nach Osten!")
-      return "E"
-    end
-    if possibleDirections["W"] and train.passenger.destY-1 < train.x and random() < .7 then
-      print("Auf nach Westen")
-      return "W"
+    if #tbl > 0 then
+      return tbl[random(#tbl)]
     end
   else -- kein Passagier
     return chooseRandom(train, possibleDirections)
@@ -92,8 +92,8 @@ end
 -- wählt zufällig aus den möglichen Richtungen eine aus
 function chooseRandom(train, possibleDirections)
   tbl = {}
-  for dir,bool in pairs(possibleDirections) do 
+  for dir,bool in pairs(possibleDirections) do
     tbl[#tbl+1] = dir
   end
   return tbl[random(#tbl)]
-end
+end 
