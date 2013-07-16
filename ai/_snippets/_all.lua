@@ -1,3 +1,5 @@
 require('_snippets/distance.lua')
 require('_snippets/printMap.lua')
 require('_snippets/printTable.lua')
+require('_snippets/getDirections.lua')
+require('_snippets/map2railMap.lua')
