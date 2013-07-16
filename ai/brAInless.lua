@@ -9,9 +9,6 @@ function ai.init(map, money)
   print("I got " .. money .. " credits to spend!!")
   print("map size:", map.height, map.width)
   rememberMap = map
-
-
-  
   while money >= 25 do    -- Ein Zug kostet 25 Credits
     buyTrain(random(map.width), random(map.height))
     money = money - 25
@@ -68,25 +65,23 @@ function chooseAlmostBrainless(train, possibleDirections)
     print("train.passenger destination:", train.passenger.destX, train.passenger.destY)
     print("train.pos:", train.x, train.y)
     tbl = {}
-    if possibleDirections["N"] and train.passenger.destY+1 < train.y then
+    if possibleDirections["N"] and (train.passenger.destY+1 < train.y or random() < 0.3) then
       tbl[#tbl+1] = "N"
     end
-    if possibleDirections["S"] and train.passenger.destY-1 > train.y then
+    if possibleDirections["S"] and (train.passenger.destY-1 > train.y or random() < 0.3) then
       tbl[#tbl+1] = "S"
     end
-    if possibleDirections["E"] and train.passenger.destX+1 > train.x then
+    if possibleDirections["E"] and (train.passenger.destX+1 > train.x or random() < 0.3) then
       tbl[#tbl+1] = "E"
     end
-    if possibleDirections["W"] and train.passenger.destX-1 < train.x then
+    if possibleDirections["W"] and (train.passenger.destX-1 < train.x or random() < 0.3) then
       tbl[#tbl+1] = "W"
     end
-    
     if #tbl > 0 then
       return tbl[random(#tbl)]
     end
-  else -- kein Passagier
-    return chooseRandom(train, possibleDirections)
   end
+  return chooseRandom(train, possibleDirections)
 end
 
 -- wählt zufällig aus den möglichen Richtungen eine aus
