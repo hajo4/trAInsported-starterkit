@@ -10,5 +10,7 @@ function map2railMap(map)
             end
         end
     end
+    railMap.width = map.width
+    railMap.height = map.height
     return railMap
 end

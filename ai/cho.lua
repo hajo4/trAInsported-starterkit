@@ -8,8 +8,13 @@ function ai.init(map, money)
   print("Initialized! Hello World!")
   print("I got " .. money .. " credits to spend!!")
   print("map size:", map.height, map.width)
-  rememberMap = map
 
+  print(type(map))
+
+  print(type(makeRailMap(map)))
+
+  printMap(makeRailMap(map))
+  -- printTable(map2railMap(map))
   while money >= 25 do    -- Ein Zug kostet 25 Credits
     buyTrain(random(map.width), random(map.height))
     money = money - 25
@@ -55,41 +60,3 @@ function ai.newPassenger(name, x, y, destX, destY)
   print("Neuer Fahrgast: " .. name)
   rememberPassengers[name] = {x=x,y=y,destX=destX,destY=destY}
 end
-
--- ------------
--- LOCAL HELPER
--- ------------
-
--- Wenn ein Passagier an Board ist wird versucht diesen ans Ziel zu bringen
-function chooseAlmostBrainless(train, possibleDirections)
-  if train.passenger then 
-    print("train.passenger destination:", train.passenger.destX, train.passenger.destY)
-    print("train.pos:", train.x, train.y)
-    tbl = {}
-    if possibleDirections["N"] and (train.passenger.destY+1 < train.y) then
-      tbl[#tbl+1] = "N"
-    end
-    if possibleDirections["S"] and (train.passenger.destY-1 > train.y) then
-      tbl[#tbl+1] = "S"
-    end
-    if possibleDirections["E"] and (train.passenger.destX+1 > train.x) then
-      tbl[#tbl+1] = "E"
-    end
-    if possibleDirections["W"] and (train.passenger.destX-1 < train.x) then
-      tbl[#tbl+1] = "W"
-    end
-    if #tbl > 0 and (random(100) > 10) then
-      return tbl[random(#tbl)]
-    end
-  end
-  return chooseRandom(train, possibleDirections)
-end
-
--- wählt zufällig aus den möglichen Richtungen eine aus
-function chooseRandom(train, possibleDirections)
-  tbl = {}
-  for dir,bool in pairs(possibleDirections) do
-    tbl[#tbl+1] = dir
-  end
-  return tbl[random(#tbl)]
-end 
