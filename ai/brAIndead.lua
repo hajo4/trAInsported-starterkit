@@ -8,13 +8,8 @@ function ai.init(map, money)
   print("Initialized! Hello World!")
   print("I got " .. money .. " credits to spend!!")
   print("map size:", map.height, map.width)
+  rememberMap = map
 
-  print(type(map))
-
-  print(type(makeRailMap(map)))
-
-  printMap(makeRailMap(map))
-  -- printTable(map2railMap(map))
   while money >= 25 do    -- Ein Zug kostet 25 Credits
     buyTrain(random(map.width), random(map.height))
     money = money - 25
@@ -61,7 +56,11 @@ function ai.newPassenger(name, x, y, destX, destY)
   rememberPassengers[name] = {x=x,y=y,destX=destX,destY=destY}
 end
 
--- -----
+-- ------------
+-- LOCAL HELPER
+-- ------------
+
+-- wählt zufällig aus den möglichen Richtungen eine aus
 function chooseRandom(train, possibleDirections)
   tbl = {}
   for dir,bool in pairs(possibleDirections) do
