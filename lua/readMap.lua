@@ -1,5 +1,7 @@
 function readMap (file)
   local map = {}
+
+  -- Codierung
   map[0] = nil
   map[1] = "C"
   map[2] = "S"
@@ -8,12 +10,17 @@ function readMap (file)
 
   local fp = assert(io.open (file))
   local csv = {}
+  j = 1
   for line in fp:lines() do
     local row = {}
-    for value in line:gmatch("[^ ]*") do -- note: doesn\'t work with strings that contain , values
-      row[#row+1] = map[value]
+    i = 1
+    for token in string.gmatch(line, "[^%s]+") do
+      row[i] = map[tonumber(token)]
+      i = i+1
     end
-    csv[#csv+1] = row
+    csv[j] = row
+    j = j+1
+    
   end
   -- csv contains now rows / colums from the csv file, i.e.
   return csv

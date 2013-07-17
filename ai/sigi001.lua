@@ -1,4 +1,5 @@
 -- Tutorial 4: Close is good!
+railMap = {}
 
 function ai.init(map, money, maximumTrains)
     for x = 1, map.width, 1 do
@@ -8,8 +9,14 @@ function ai.init(map, money, maximumTrains)
             end
         end
     end
-    printMap(map)
     spawned_passengers = {}
+    railMap = map2railMap(map)
+    print('start')
+    path = searchPath( 0, "S", 4, 3, 5, 5, railMap )
+    for value in path do
+        print value
+    end
+    print('end')
     
     buyTrain(random(map.width), random(map.height))
 end
