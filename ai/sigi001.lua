@@ -1,24 +1,62 @@
+require('_snippets/_all.lua')
+
+
+function goDir( railMap, loc, dir )
+    h = railMap.height
+    w = railMap.width
+    x = loc.x
+    y = loc.y
+    if dir == "S" then y = y+1 end
+    if dir == "N" then y = y-1 end
+    if dir == "W" then x = x-1 end
+    if dir == "E" then x = x+1 end
+    if x > w or y > h or x < 1 or y < 1 then
+        print("out of range "..x.." "..y)
+    else
+        return {["x"]=x, ["y"]=y, ["dir"]=dir}
+    end
+end 
+
 -- Tutorial 4: Close is good!
 railMap = {}
 
+function dir2String( map, loc )
+    x = loc.x
+    y = loc.y
+    dir = loc.dir
+    dirs = getDirections( map, loc )
+    str = "loc("..x.." "..y.." "..dir..") -> "
+    if dirs[1] then
+        str = str..dirs[1].." "
+    end
+    if dirs[2] then
+        str = str..dirs[2].." "
+    end
+    if dirs[3] then
+        str = str..dirs[2].." "
+    end
+    if dirs[4] then
+        str = str..dirs[2].." "
+    end
+    return str
+end
+
 function ai.init(map, money, maximumTrains)
-    for x = 1, map.width, 1 do
-        for y = 1, map.height, 1 do
-            if map[x][y] == "S" then 
-                print("Hotspot found at: "..x..", "..y.."!")
-            end
-        end
-    end
-    spawned_passengers = {}
     railMap = map2railMap(map)
-    print('start')
-    path = searchPath( 0, "S", 4, 3, 5, 5, railMap )
-    for value in path do
-        print value
-    end
-    print('end')
-    
     buyTrain(random(map.width), random(map.height))
+
+
+
+    loc = { ["x"]=4, ["y"]=2, ["dir"]="S" }
+    target = { ["x"]=10, ["y"]=5}
+
+
+    path = searchPath( 0, railMap, loc, target)
+    for i=1, #path do 
+        print(path[i].x.." "..path[i].y.." "..path[i].dir)
+    end
+
+
 end
 
 function distance(x1, y1, x2, y2)
@@ -27,62 +65,16 @@ function distance(x1, y1, x2, y2)
 end
 
 function ai.chooseDirection(train, directions)
-    if train.passenger == nil then
-        print(train.name.."carries no passenger.")
-        return "W"
-    else
-        print(train.name.." carries "..train.passenger.name)
-        if train.passenger.destX < train.x then
-            return "W"
-        else
-            return "E"
-        end
-    end
+
 end
 
 function ai.newPassenger(name, x, y, destX, destY, vipTime)
-   print("passenger spawned at: "..x..", "..y.."!")
-   p = {}
-   p.name = name
-   p.x = x
-   p.y = y
-   p.destX = destX
-   p.destY = destY
-   p.vipTime = vipTime
-   table.insert(spawned_passengers, p)
-   print(spawned_passengers)
 end
 
-function printMap(map)
-    str = {}
-    for j = 1, map.height do
-        str[j] = ""
-        for i = 1, map.width do
-            if map[i][j] then 
-                str[j] = str[j] .. map[i][j] .. " "
-            else
-                str[j] = str[j] .. "- "
-            end
-        end
-    end
-    for i = 1, #str do
-        print(str[i])
-    end
-end
+
 
 function ai.foundPassengers( train, passengers )
-    pass = nil
-    dist = 100
-    i = 1
-    while i<= #passengers do
-        d = distance( train.x, train.y, passengers[i].destX,passengers[i].destY)
-        if d < dist then
-            dist = d
-            pass = passengers[i]
-        end
-        i = i+1
-    end
-    return pass
+    return passengers[1]
 end
 
 function ai.foundDestination( train )
