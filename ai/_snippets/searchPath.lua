@@ -1,25 +1,32 @@
-function searchPath( value, dir, x, y, destX, destY, railMap )
-	path = {}
-	value = value + 1
-	if dir == "N" then y = y-1 end
-    if dir == "S" then y = y+1 end
-    if dir == "E" then x = x+1 end
-    if dir == "W" then x = x-1 end
-    
-    if x == destX and y == destY then
-    	new_dir_tmp = dir
-    else
-		new_dirs = getDirections(railMap, x, y)
-		min = nil
-		new_dir_tmp = nil
-		for new_dir in new_dirs do 
-			path = searchPath( value, dir, x, y, destX, destY, railMap )
-			if #path < min then
-				min = #path
-				new_dir_tmp = new_dir
+
+
+function searchPath( level, railMap, location, target  )
+	max_level = railMap.height * railMap.width / 2 -- this is a guess
+	if max_level == level then
+		return "TOOLONG"
+	else
+		print(level..": from "..dir2String(railMap,location).." "..(level+1).." to "..target.x.." "..target.y)
+
+		if location.x == target.x and location.y == target.y then
+			print(" arrived at target!")
+			return {}
+		else
+			local dirs = getDirections( railMap, location )
+
+			local path = {}
+			local min = max_level+100
+			for index, dir in pairs(dirs) do 
+				local new_loc = goDir( railMap, location, dir )
+				local res = searchPath( level+1, railMap, new_loc, target )
+				if res ~= "TOOLONG" then
+					table.insert(res, {["x"]=location.x, ["y"]=location.y, ["dir"]=dir})
+					if #res < min then
+						path = res
+						min = #path
+					end
+				end
 			end
+			return path
 		end
 	end
-	prepend({new_dir_tmp}, path)
-	return path
 end
