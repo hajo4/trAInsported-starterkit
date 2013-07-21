@@ -1,4 +1,4 @@
-require('utilities')
+require('_utilities/utilities')
 --
 -- Der TaxiDriver Bot fährt zufällig auf der Karte herum, solange er keinen Fahrgast hat.
 -- Sobald er an Fahrgästen vorbeifährt nimmt er den ersten und sucht den kürzesten Pfad

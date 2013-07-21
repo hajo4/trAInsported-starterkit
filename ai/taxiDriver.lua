@@ -1,4 +1,4 @@
-require('utilities')
+require('_utilities/utilities')
 --
 -- Der TaxiDriver Bot fährt zufällig auf der Karte herum, solange er keinen Fahrgast hat.
 -- Sobald er an Fahrgästen vorbeifährt nimmt er den ersten und sucht den kürzesten Pfad
@@ -61,4 +61,17 @@ end
 -- wird gerufen wenn der Zug am Zielort angekommen ist
 function ai.foundDestination( train )
     dropPassenger(train)
+end
+
+-- Wird aufgerufen, wenn genug geld für einen neuen Zug da ist
+function ai.enoughMoney(money)
+  x = random(rememberMap.width)
+  y = random(rememberMap.height)
+  buyTrain(x, y)
+end
+
+-- Wird aufgerufen, wenn der Zug blockiert wird
+-- (Beispielsweise durch einen anderen Zug)
+function ai.blocked(train, possibleDirections, lastDirection)
+  return lastDirection
 end
