@@ -16,7 +16,7 @@ Um das Spiel zu installieren macht man am besten folgendes:
 ## Lua Überblick
 Eine Übersicht über Arrays, Schleifen und Co. findest du in `Lua.lua` oder hier:
 
-```lua
+````lua
 -- Variablen sind generell global
 globalerText 	= 'ein spannender Text'
 globalerInt 	= 1
@@ -78,7 +78,7 @@ end
 for i,value in ipairs(tabelle) do
 	print(i,value)
 end
-```
+````
 
 ## trAInsported Überblick
 
@@ -124,7 +124,7 @@ end
 -- ACHTUNG: es wird nicht gerufen wenn man AUF der Kreuzung ist sondern DAVOR
 -- zurückgeben sollte man eine Richtung ("N", "S", "W", "E") aus dem parameter possibleDirections
 function ai.chooseDirection(train, possibleDirections)    
-    local dir chooseRandomDir(possibleDirections) 
+    local dir = chooseRandomDir(possibleDirections) 
     if train.passenger then
         -- berechne die beste Richtung
         local startx, starty = train.x ,train.y
@@ -177,4 +177,4 @@ function mapToJumperMap(map)
   end
   return jumperMap
 end
-```
+````
