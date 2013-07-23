@@ -82,7 +82,7 @@ end
 
 ## trAInsported Überblick
 
-````
+```lua
 require '_utilities/utilities.lua'
 require '_jumper/jumper.lua'
 --
@@ -177,4 +177,4 @@ function mapToJumperMap(map)
   end
   return jumperMap
 end
-````
+```
