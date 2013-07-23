@@ -1,17 +1,6 @@
 require '_utilities/utilities.lua'
 require '_jumper/jumper.lua'
--- Simple check to assert if Jumper was successfully imported and highlight all its submodules
-do
-    if not (Jumper) then 
-        error('Error Loading Module Jumper') 
-    end
-    print(('Module Jumper loaded successfully (@ %s)'):format(tostring(Jumper)))
-    for k,v in pairs(Jumper) do
-        print(('\t>> Submodule %s (@ %s)'):format(k,tostring(v)))
-    end
-end
-
-rememberPassengers = {}
+rememberedPassengers = {}
 jumperMap = {}
 myFinder = {}
 lookupMap = {}
@@ -36,7 +25,7 @@ function ai.init(map, money)
   local grid = Grid(jumperMap) 
   -- Creates a pathfinder object using Jump Point Search
   myFinder = Pathfinder(grid, 'BFS', walkable) 
-buyTrain(1, 1)
+  buyTrain(1, 1)
   -- Define start and goal locations coordinates
 
 end
@@ -50,10 +39,11 @@ end
 -- train [table]
 -- possibleDirections [table]
 function ai.chooseDirection(train, possibleDirections)
-  if train.passenger then
-    local startx, starty = train.x ,train.y
-    local endx, endy = train.passenger.destX, train.passenger.destY
+  local startx, starty = train.x ,train.y
+  
 
+  if train.passenger then -- go to passenger
+    local endx, endy = train.passenger.destX, train.passenger.destY
     -- Calculates the path, and its length
     local path = myFinder:getPath(startx, starty, endx, endy)
     kreuzung = makeLoc( path[2].x, path[2].y, train.dir)
@@ -63,10 +53,29 @@ function ai.chooseDirection(train, possibleDirections)
       if test_loc.x == nachKreuzung.x and test_loc.y == nachKreuzung.y then return dir end
     end
 
-  end
+  else -- no passenger
+    local minDist = nil
+    local dest = nil
+    for name, info in pairs(rememberedPassengers) do
+        local dist = manhattanDist( train.x, train.y, info.loc.x, info.loc.y)
+        if minDist == nil or minDist > dist then
+            minDist = dist
+            dest = info.loc
+        end
+    end
 
-  -- fallback
-  return chooseAlmostBrainless(train, possibleDirections)
+    local endx, endy = dest.x, dest.y
+    local path = myFinder:getPath(startx, starty, endx, endy)
+    if #path > 2 then
+      kreuzung = makeLoc( path[2].x, path[2].y, train.dir)
+      nachKreuzung = makeLoc( path[3].x, path[3].y, train.dir )
+      for dir, bool in pairs(possibleDirections) do
+        local test_loc = goDir( railMap, kreuzung, dir )
+        if test_loc.x == nachKreuzung.x and test_loc.y == nachKreuzung.y then return dir end
+      end
+    end
+    return chooseRandomDir(possibleDirections)        
+  end
 end
 
 -- Wird aufgerufen, wenn der Zug blockiert wird
@@ -76,25 +85,38 @@ function ai.blocked(train, possibleDirections, lastDirection)
 end
 
 -- Wird aufgerufen, wenn der Zug an einem Passagier vorbeikommt
-function ai.foundPassengers(train, passengers)
-  
-
-  if train.passenger then return nil end
-  return passengers[1]
+function ai.foundPassengers( train, passengers )
+    local p = nil 
+    if train.passenger then
+        -- Wenn der Zug voll ist, halte nicht für Fahrgäste am Straßenrand
+    else
+        -- get passenger with the smallest Manhattan Distance to target destination
+        local minDist = nil
+        for index, pass in pairs(passengers) do
+            local dist = rememberedPassengers[pass.name].dist
+            if minDist == nil or minDist > dist then
+                minDist = dist
+                p = pass
+            end
+        end
+        -- diesen Fahrgast bringen wir ans Ziel, das nächste mal ist er nicht mehr hier!
+        rememberedPassengers[p.name] = nil
+    end
+    return p
 end
+
 
 -- Wird aufgerufen, wenn der Zug am Ziel des Passagiers ankommt
 function ai.foundDestination(train)
-  print("get off!")
   dropPassenger(train)
-  
-  print("Money: " .. getMoney())
 end
 
 -- Wird aufgerufen, wenn ein neuer Fahrgast erscheint
-function ai.newPassenger(name, x, y, destX, destY)
-  print("Neuer Fahrgast: " .. name)
-  rememberPassengers[name] = {x=x,y=y,destX=destX,destY=destY}
+function ai.newPassenger(name, x, y, destX, destY, vipTime)
+    -- Benutze die Manhattan Distance als Heuristik für die Entfernung zum Ziel
+    local dist = manhattanDist(x,y,destX,destY)
+    local loc = makeLoc(x,y, nil)
+    rememberedPassengers[name] = { ["dist"]=dist, ["loc"]=loc }
 end
 
 -- ------------
@@ -102,29 +124,7 @@ end
 -- ------------
 
 -- Wenn ein Passagier an Board ist wird versucht diesen ans Ziel zu bringen
-function chooseAlmostBrainless(train, possibleDirections)
-  if train.passenger then 
-    print("train.passenger destination:", train.passenger.destX, train.passenger.destY)
-    print("train.pos:", train.x, train.y)
-    tbl = {}
-    if possibleDirections["N"] and (train.passenger.destY+1 < train.y) then
-      tbl[#tbl+1] = "N"
-    end
-    if possibleDirections["S"] and (train.passenger.destY-1 > train.y) then
-      tbl[#tbl+1] = "S"
-    end
-    if possibleDirections["E"] and (train.passenger.destX+1 > train.x) then
-      tbl[#tbl+1] = "E"
-    end
-    if possibleDirections["W"] and (train.passenger.destX-1 < train.x) then
-      tbl[#tbl+1] = "W"
-    end
-    if #tbl > 0 and (random(100) > 10) then
-      return tbl[random(#tbl)]
-    end
-  end
-  return chooseRandom(train, possibleDirections)
-end
+
 
 -- wählt zufällig aus den möglichen Richtungen eine aus
 function chooseRandom(train, possibleDirections)
