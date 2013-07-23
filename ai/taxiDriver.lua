@@ -1,4 +1,5 @@
-require('_utilities/utilities')
+require '_utilities/utilities.lua'
+require '_jumper/jumper.lua'
 --
 -- Der TaxiDriver Bot fährt zufällig auf der Karte herum, solange er keinen Fahrgast hat.
 -- Sobald er an Fahrgästen vorbeifährt nimmt er den ersten und sucht den kürzesten Pfad
@@ -10,6 +11,15 @@ railMap = {}
 -- wird zu Beginn des Spieles gerufen. Hier sollte ein Zug gekauft werden!
 function ai.init(map, money, maximumTrains)
     railMap = map2railMap(map)
+
+    -- initialisiere die Pfadfinde-Bibliothek
+    jumperMap = mapToJumperMap(map)
+    local walkable = 1
+    local Grid = Jumper.Grid  
+    local Pathfinder = Jumper.Pathfinder 
+    local grid = Grid(jumperMap) 
+    myFinder = Pathfinder(grid, 'BFS', walkable) 
+
     buyTrain(random(map.width), random(map.height))
 end
 
@@ -20,35 +30,30 @@ function ai.foundPassengers( train, passengers )
         -- Wenn der Zug voll ist, halte nicht für Fahrgäste am Straßenrand
         print('Ich bin schon voll!')
     else
-        -- Wir nehmen den ersten Fahrgast an diesem Ort mit
         p = passengers[1]
-        -- Finde den kürzesten Weg mit Tiefensuche
-        local location = { ["x"]=train.x,["y"]=train.y,["dir"]=train.dir }
-        local target   = { ["x"]=p.destX, ["y"]=p.destY, }
-        local path     = depthFirstSearch( 0, railMap, location, target )
-        -- Speichere wo der Zug an der Kreuzung langfahren muss
-        passengerMap   = railMap
-        for i=1, #path do 
-            passengerMap[ path[i].x ][ path[i].y ] = path[i].dir 
-        end
-        print('Fahrgast steigt ein!')
-    end
+    end  
     return p
 end
 
 -- wird gerufen wenn man eine Kachel vor einer Kreuzung ist.
 -- ACHTUNG: es wird nicht gerufen wenn man AUF der Kreuzung ist sondern DAVOR
 -- zurückgeben sollte man eine Richtung ("N", "S", "W", "E") aus dem parameter possibleDirections
-function ai.chooseDirection(train, possibleDirections)
-    local dir = nil
-    local trainLoc = makeLoc(train.x, train.y, train.dir)
-    local crossingsLoc = goDir( railMap, trainLoc, train.dir ) -- crossingLoc ~= trainLoc
+function ai.chooseDirection(train, possibleDirections)    
+    local dir chooseRandomDir(possibleDirections) 
     if train.passenger then
-        -- abfragen der vorberechneten Richtung
-        dir = passengerMap[crossingsLoc.x][crossingsLoc.y]
-    else
-        -- kein Fahrgast an Bord. Zufällige Wahl.
-        dir = chooseRandomDir(possibleDirections)        
+        -- berechne die beste Richtung
+        local startx, starty = train.x ,train.y
+        local endx, endy = train.passenger.destX, train.passenger.destY
+        local path = myFinder:getPath(startx, starty, endx, endy)
+        kreuzung = makeLoc( path[2].x, path[2].y, train.dir)
+        nachKreuzung = makeLoc( path[3].x, path[3].y, train.dir )
+        for d, bool in pairs(possibleDirections) do
+          local test_loc = goDir( railMap, kreuzung, d )
+          if test_loc.x == nachKreuzung.x and test_loc.y == nachKreuzung.y then
+            dir = d 
+            break 
+          end
+        end
     end
     return dir
 end
@@ -63,15 +68,27 @@ function ai.foundDestination( train )
     dropPassenger(train)
 end
 
--- Wird aufgerufen, wenn genug geld für einen neuen Zug da ist
-function ai.enoughMoney(money)
-  x = random(rememberMap.width)
-  y = random(rememberMap.height)
-  buyTrain(x, y)
-end
+function chooseRandom(train, possibleDirections)
+  tbl = {}
+  for dir,bool in pairs(possibleDirections) do
+    tbl[#tbl+1] = dir
+  end
+  return tbl[random(#tbl)]
+end 
 
--- Wird aufgerufen, wenn der Zug blockiert wird
--- (Beispielsweise durch einen anderen Zug)
-function ai.blocked(train, possibleDirections, lastDirection)
-  return lastDirection
+function mapToJumperMap(map)
+  local jumperMap = {}
+  for i=1, map.width do
+      for j=1, map.height do
+          if not jumperMap[j] then
+           jumperMap[j] = {}
+          end
+          if map[i][j] == 'C' then
+              jumperMap[j][i] = 1
+          else
+              jumperMap[j][i] = 0
+          end
+      end
+  end
+  return jumperMap
 end
