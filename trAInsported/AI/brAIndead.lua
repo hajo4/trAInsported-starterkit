@@ -1,5 +1,3 @@
-require('_snippets/_all.lua')
-
 rememberPassengers = {}
 rememberMap = nil
 

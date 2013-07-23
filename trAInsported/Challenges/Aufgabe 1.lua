@@ -12,7 +12,7 @@ local _map = {
 
 local ch = {}
 
-ch.name = "Getting Started 3"
+ch.name = "Herausforderung 1"
 ch.version = "3"
 
 ch.maxTrains = 1
@@ -41,16 +41,17 @@ local startTime = 0
 local passengersCreated = false
 local maxTime = 60
 local passengersRemaining = 1
-local startupMessage = "Welcome to Smalltown!\nSmalltown is a little town in the middle of nowhere. Only recently has it been connected to its neighbouring town by rails. Of course, all the people in Smalltown want to be the first ones shopping over there. Get the passengers to the other town within " .. maxTime .. " seconds!"
+local startupMessage = "Ein einfacher Start. Du hast eine Minute um den Fahrgast an Ziel zu bringen. \n Nützliche Tasten sind: 'm' und die 'Leertaste'." 
 
 function ch.start()
   challenges.setMessage(startupMessage)
 end
 
 function ch.update(time)
+  math.random()
   if time > 1 and not passengersCreated then
     passengersCreated = true
-    passenger.new( 1, 3 , 7 + math.random(1), math.random(3) )
+    passenger.new( 3, 3 , 10, 7)
     passengersRemaining = 1
   end
   if time <= 20 and time >= 10 then

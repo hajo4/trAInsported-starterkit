@@ -12,10 +12,11 @@ Um das Spiel zu installieren macht man am besten folgendes:
 6. ersetzte den Ordner `trAInsported` mit dem gleichnamigen aus dem Repository
 7. die AI's befinden sich im Ordner AI
 
+
 ## Lua Überblick
 Eine Übersicht über Arrays, Schleifen und Co. findest du in `Lua.lua` oder hier:
 
-```` lua
+```lua
 -- Variablen sind generell global
 globalerText 	= 'ein spannender Text'
 globalerInt 	= 1
@@ -77,10 +78,11 @@ end
 for i,value in ipairs(tabelle) do
 	print(i,value)
 end
-````
+```
 
 ## trAInsported Überblick
-```` lua
+
+````
 require '_utilities/utilities.lua'
 require '_jumper/jumper.lua'
 --

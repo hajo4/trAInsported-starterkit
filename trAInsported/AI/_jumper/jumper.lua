@@ -15,10 +15,7 @@ end
 
 -- Default comparison function
 local function f_min(a,b)
-	if type(a) == 'table' and type(b) == 'table' then
-		return #a < #b
-	end
-  	return a < b
+  	return a.f < b.f
 end
 
 -- Percolates up

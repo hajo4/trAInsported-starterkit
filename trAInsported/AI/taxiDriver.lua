@@ -44,14 +44,16 @@ function ai.chooseDirection(train, possibleDirections)
         -- berechne die beste Richtung
         local startx, starty = train.x ,train.y
         local endx, endy = train.passenger.destX, train.passenger.destY
-        local path = myFinder:getPath(startx, starty, endx, endy)
-        kreuzung = makeLoc( path[2].x, path[2].y, train.dir)
-        nachKreuzung = makeLoc( path[3].x, path[3].y, train.dir )
-        for d, bool in pairs(possibleDirections) do
-          local test_loc = goDir( railMap, kreuzung, d )
-          if test_loc.x == nachKreuzung.x and test_loc.y == nachKreuzung.y then
-            dir = d 
-            break 
+        local path = myFinder:getPath(startx, starty, endx, endy) 
+        if not (endx == path[2].x and endy == path[2].y) then -- sonst gibt es einen Fehler
+          kreuzung = makeLoc( path[2].x, path[2].y, train.dir)
+          nachKreuzung = makeLoc( path[3].x, path[3].y, train.dir )
+          for d, bool in pairs(possibleDirections) do
+            local test_loc = goDir( railMap, kreuzung, d )
+            if test_loc.x == nachKreuzung.x and test_loc.y == nachKreuzung.y then
+              dir = d 
+              break 
+            end
           end
         end
     end
