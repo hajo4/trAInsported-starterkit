@@ -5,16 +5,9 @@ rememberMap = nil
 
 -- Wird aufgerufen, wenn das Spiel startet
 function ai.init(map, money)
-  print("Initialized! Hello World!")
-  print("I got " .. money .. " credits to spend!!")
-  print("map size:", map.height, map.width)
-
-  print(type(map))
-
-  print(type(makeRailMap(map)))
-
-  printMap(makeRailMap(map))
-  -- printTable(map2railMap(map))
+  local test = {}
+  test['x'] = 123
+  print(test.x)
   while money >= 25 do    -- Ein Zug kostet 25 Credits
     buyTrain(random(map.width), random(map.height))
     money = money - 25

@@ -44,10 +44,7 @@ end
 
 -- Wird aufgerufen, wenn der Zug am Ziel des Passagiers ankommt
 function ai.foundDestination(train)
-  print("get off!")
   dropPassenger(train)
-  
-  print("Money: " .. getMoney())
 end
 
 -- Wird aufgerufen, wenn ein neuer Fahrgast erscheint
@@ -66,5 +63,6 @@ function chooseRandom(train, possibleDirections)
   for dir,bool in pairs(possibleDirections) do
     tbl[#tbl+1] = dir
   end
-  return tbl[random(#tbl)]
+  ret = tbl[random(#tbl)]
+  return ret
 end 
