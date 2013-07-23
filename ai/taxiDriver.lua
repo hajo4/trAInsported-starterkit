@@ -39,7 +39,7 @@ end
 -- ACHTUNG: es wird nicht gerufen wenn man AUF der Kreuzung ist sondern DAVOR
 -- zurückgeben sollte man eine Richtung ("N", "S", "W", "E") aus dem parameter possibleDirections
 function ai.chooseDirection(train, possibleDirections)    
-    local dir chooseRandomDir(possibleDirections) 
+    local dir = chooseRandomDir(possibleDirections) 
     if train.passenger then
         -- berechne die beste Richtung
         local startx, starty = train.x ,train.y
